@@ -15,7 +15,6 @@ import {
 const firebaseConfig = {
   apiKey: "AIzaSyDW2N0_vb42dT0LTjmMkL9xvl02Q3G3uqw",
   authDomain: "e-commerce-cap-store.firebaseapp.com",
-  databaseURL: "https://e-commerce-cap-store-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "e-commerce-cap-store",
   storageBucket: "e-commerce-cap-store.firebasestorage.app",
   messagingSenderId: "966489936166",
