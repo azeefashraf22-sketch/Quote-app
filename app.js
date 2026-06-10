@@ -1,13 +1,13 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-
 import {
   getFirestore,
   doc,
-  setDoc,
   serverTimestamp,
   addDoc,
   collection,
-  getDocs,
+  onSnapshot,
+  query,
+  orderBy,
   updateDoc,
   deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
@@ -24,58 +24,60 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-console.log("db =>", db);
-console.log("app =>", app);
 
+const quoteInput = document.getElementById("quoteInput");
+const addbtn = document.getElementById("addBtn");
+const quoteList = document.getElementById("quoteList");
 
-var addbtn = document.getElementById("addBtn");
-var quoteList = document.getElementById("quoteList");
-addbtn.addEventListener("click", addQuote);
+const quoteCollection = collection(db, "quotes");
+const q = query(quoteCollection, orderBy("time", "desc"));
 
-var quoteInput = document.getElementById("quoteInput");
-const quoteCollection = collection(db, "quotes",);
-async function addQuote() {
+//  1. Real-time Listener
+onSnapshot(q, (snapshot) => {
+  quoteList.innerHTML = "";
+  snapshot.forEach((docSnap) => {
+    const id = docSnap.id;
+    const data = docSnap.data();
+
+    const li = document.createElement("li");
+    li.innerHTML = `
+            <span>${data.quote}</span>
+            <div class="actions">
+                <button class="edit-btn">Edit</button>
+                <button class="delete-btn">Delete</button>
+            </div>
+        `;
+
+    // Buttons ke Events
+    li.querySelector(".edit-btn").onclick = () => editQuote(id, data.quote);
+    li.querySelector(".delete-btn").onclick = () => deleteQuote(id);
+
+    quoteList.appendChild(li);
+  });
+});
+
+//  2. Add Quote 
+addbtn.onclick = async () => {
+  if (quoteInput.value.trim() === "") return;
   await addDoc(quoteCollection, {
     quote: quoteInput.value,
     time: serverTimestamp(),
   });
-  getQuote();
+  quoteInput.value = "";
 };
 
-async function getQuote() {
-  quoteList.innerHTML = ""
-  const querySnapshot = await getDocs(quoteCollection);
-  querySnapshot.forEach((doc) => {
-    console.log("id=>", doc.id, " => ", doc.data().quote);
-    const li = document.createElement("li");
-    li.textContent = doc.data().quote + " ";
-    const editBtn = document.createElement("button");
-    editBtn.textContent = "Edit";
-    editBtn.addEventListener("click", function () {
-      editQuote(doc.id, doc.data().quote);
-    });
-
-    const deleteBtn = document.createElement("button");
-    deleteBtn.textContent = "Delete";
-    deleteBtn.addEventListener("click", function () {
-      deleteQuote(doc.id);
-    });
-    li.appendChild(editBtn);
-    li.appendChild(deleteBtn);
-    quoteList.appendChild(li);
-  });
-}
-getQuote();
-
+//  3. Edit Quote 
 async function editQuote(id, oldQuote) {
-  const newQuote = await prompt("enter new quote", oldQuote);
-  await updateDoc(doc(db, "quotes", id), {
-    quote: newQuote,
-  });
+  const newQuote = prompt("Enter new quote:", oldQuote);
+  if (newQuote && newQuote !== oldQuote) {
+    const docRef = doc(db, "quotes", id);
+    await updateDoc(docRef, { quote: newQuote });
+  }
 }
 
-// deleteQuote function
+//  4. Delete Quote 
 async function deleteQuote(id) {
-  await deleteDoc(doc(db, "quotes", id))
-  getQuote()
+  if (confirm("Are you sure?")) {
+    await deleteDoc(doc(db, "quotes", id));
+  }
 }
