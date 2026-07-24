@@ -48,7 +48,6 @@ onSnapshot(q, (snapshot) => {
             </div>
         `;
 
-    // Buttons ke Events
     li.querySelector(".edit-btn").onclick = () => editQuote(id, data.quote);
     li.querySelector(".delete-btn").onclick = () => deleteQuote(id);
 
