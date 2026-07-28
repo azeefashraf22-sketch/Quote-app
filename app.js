@@ -12,6 +12,7 @@ import {
   deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
+// firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyDW2N0_vb42dT0LTjmMkL9xvl02Q3G3uqw",
   authDomain: "e-commerce-cap-store.firebaseapp.com",
@@ -32,7 +33,7 @@ const quoteList = document.getElementById("quoteList");
 const quoteCollection = collection(db, "quotes");
 const q = query(quoteCollection, orderBy("time", "desc"));
 
-//  1. Real-time Listener
+//  Real-time Listener
 onSnapshot(q, (snapshot) => {
   quoteList.innerHTML = "";
   snapshot.forEach((docSnap) => {
@@ -55,7 +56,7 @@ onSnapshot(q, (snapshot) => {
   });
 });
 
-//  2. Add Quote 
+//  Add Quote 
 addbtn.onclick = async () => {
   if (quoteInput.value.trim() === "") return;
   await addDoc(quoteCollection, {
@@ -65,7 +66,7 @@ addbtn.onclick = async () => {
   quoteInput.value = "";
 };
 
-//  3. Edit Quote 
+//  Edit Quote 
 async function editQuote(id, oldQuote) {
   const newQuote = prompt("Enter new quote:", oldQuote);
   if (newQuote && newQuote !== oldQuote) {
@@ -74,7 +75,7 @@ async function editQuote(id, oldQuote) {
   }
 }
 
-//  4. Delete Quote 
+//  Delete Quote 
 async function deleteQuote(id) {
   if (confirm("Are you sure?")) {
     await deleteDoc(doc(db, "quotes", id));
