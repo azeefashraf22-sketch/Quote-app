@@ -33,7 +33,7 @@ const quoteList = document.getElementById("quoteList");
 const quoteCollection = collection(db, "quotes");
 const q = query(quoteCollection, orderBy("time", "desc"));
 
-//  Real-time Listener
+// 1- Real-time Listener
 onSnapshot(q, (snapshot) => {
   quoteList.innerHTML = "";
   snapshot.forEach((docSnap) => {
@@ -56,7 +56,7 @@ onSnapshot(q, (snapshot) => {
   });
 });
 
-//  Add Quote 
+// 2- Add Quote 
 addbtn.onclick = async () => {
   if (quoteInput.value.trim() === "") return;
   await addDoc(quoteCollection, {
@@ -66,7 +66,7 @@ addbtn.onclick = async () => {
   quoteInput.value = "";
 };
 
-//  Edit Quote 
+// 3- Edit Quote 
 async function editQuote(id, oldQuote) {
   const newQuote = prompt("Enter new quote:", oldQuote);
   if (newQuote && newQuote !== oldQuote) {
@@ -75,7 +75,7 @@ async function editQuote(id, oldQuote) {
   }
 }
 
-//  Delete Quote 
+// 4- Delete Quote 
 async function deleteQuote(id) {
   if (confirm("Are you sure?")) {
     await deleteDoc(doc(db, "quotes", id));
